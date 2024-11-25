@@ -26,9 +26,9 @@ def append_to_csv(file_path, data, headers=None):
         writer.writerow(data)
 
 chrome_options = Options()
-chrome_options.add_argument("--disable-extensions")
-chrome_options.add_argument("--disable-gpu")
-chrome_options.add_argument("--no-sandbox")
+#chrome_options.add_argument("--disable-extensions")
+#chrome_options.add_argument("--disable-gpu")
+#chrome_options.add_argument("--no-sandbox")
 chrome_options.add_argument("--headless=new")
 
 def scrape_category(category):
@@ -115,7 +115,7 @@ def main():
         futures = []
         for category in categories:
             time.sleep(2)
-            executor.submit(scrape_category, category)
+            futures.append(executor.submit(scrape_category, category))
 
 
         for future in as_completed(futures):
