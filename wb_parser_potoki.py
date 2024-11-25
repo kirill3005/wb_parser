@@ -31,7 +31,6 @@ chrome_options.add_argument("--disable-gpu")
 chrome_options.add_argument("--no-sandbox")
 chrome_options.add_argument("--headless=new")
 
-
 def scrape_category(category):
     shard = category['shard']
     url = category['url']
