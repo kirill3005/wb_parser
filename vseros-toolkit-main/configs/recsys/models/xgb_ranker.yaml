@@ -1,0 +1,19 @@
+model:
+  name: xgb_ranker
+  task: rank
+  backend: xgboost
+  matrix: dense
+  params:
+    objective: rank:pairwise
+    eval_metric: ndcg@10
+    eta: 0.1
+    max_depth: 7
+    subsample: 0.8
+    colsample_bytree: 0.8
+  cv:
+    n_splits: 3
+    type: time
+    embargo: 1D
+    seed: 42
+  train:
+    n_estimators: 600

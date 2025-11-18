@@ -1,0 +1,50 @@
+recsys:
+  candidates:
+    generators:
+      covis:
+        enabled: true
+        window_days: 30
+        alpha: 0.05
+        min_count: 2
+        max_neighbors_per_item: 200
+      pop:
+        enabled: true
+        decay_days: 30
+      session_ngram:
+        enabled: true
+        max_n: 3
+        last_k: 10
+      item2vec:
+        enabled: true
+        dim: 64
+        window: 5
+        epochs: 3
+        min_count: 1
+      mf_als:
+        enabled: true
+        factors: 64
+        reg: 0.01
+        iterations: 10
+      graph_ppr:
+        enabled: true
+        restart_prob: 0.15
+        iters: 8
+    quotas:
+      covis: 40
+      pop: 20
+      session_ngram: 30
+      item2vec: 30
+      mf_als: 20
+      graph_ppr: 10
+    weights:
+      covis: 1.0
+      pop: 0.5
+      session_ngram: 0.9
+      item2vec: 0.9
+      mf_als: 0.8
+      graph_ppr: 0.7
+    K: 100
+    time_window_days: 30
+    cutoff: auto
+    seed: 42
+    jobs: -1

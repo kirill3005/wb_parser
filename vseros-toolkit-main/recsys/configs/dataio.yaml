@@ -1,0 +1,16 @@
+sessionize:
+  enable: true
+  session_gap_min: 30
+splits:
+  mode: "global"
+  train_until: null
+  val_until: null
+  test_until: null
+  embargo: "2D"
+queries:
+  scope: "session"
+  limit_per_split: null
+pairs:
+  neg_pos_ratio: 100
+  neg_strategy: "pop"
+random_seed: 42

@@ -1,0 +1,26 @@
+profile: full
+recsys:
+  candidates:
+    K: 200
+    time_window_days: 60
+    quotas:
+      covis: 80
+      pop: 40
+      session_ngram: 60
+      item2vec: 80
+      mf_als: 60
+      graph_ppr: 40
+    weights:
+      cross: 1.0
+  features:
+    blocks:
+      cross:
+        enabled: true
+        whitelist:
+          - "brand_match * recency_7d"
+          - "price_rank_cat * novelty_30d"
+      similarity:
+        profile_last_k: 30
+  dataio:
+    queries:
+      limit_per_split: null

@@ -1,0 +1,11 @@
+recsys:
+  blend:
+    modes:
+      equal: true
+      nnls:
+        nonneg: true
+        sum_to_one: true
+      meta:
+        algo: ridge
+        alpha: 1.0
+    candidates: []

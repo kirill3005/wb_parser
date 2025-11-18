@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "mmr": {
+      "type": "object",
+      "properties": {
+        "lambda": {"type": "number"},
+        "sim": {"enum": ["cosine", "jaccard", "ppr"]},
+        "k": {"type": "integer"}
+      },
+      "additionalProperties": true
+    },
+    "rules": {"type": "object"}
+  },
+  "additionalProperties": true
+}

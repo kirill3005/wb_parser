@@ -1,0 +1,13 @@
+recsys:
+  rerank:
+    mmr:
+      lambda: 0.3
+      sim: cosine
+      k: 20
+    rules:
+      dedupe_brand: false
+      price_bounds:
+        min: null
+        max: null
+      novelties:
+        min: null

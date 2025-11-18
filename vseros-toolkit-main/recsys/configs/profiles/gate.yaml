@@ -1,0 +1,33 @@
+quotas:
+  covis: 60
+  pop: 20
+  session_ngram: 40
+  item2vec: 60
+  mf_als: 40
+  lightgcn: 0
+  graph_ppr: 30
+weights:
+  covis: 1.0
+  pop: 0.4
+  session_ngram: 0.8
+  item2vec: 0.9
+  mf_als: 0.9
+  lightgcn: 0.9
+  graph_ppr: 0.7
+K: 100
+time_window_days: 30
+cutoff: auto
+use_heavy_models: false
+random_seed: 42
+jobs: -1
+features:
+  blocks:
+    similarity:
+      enabled: true
+    sequence:
+      last_k: [5, 10]
+dataio:
+  queries:
+    limit_per_split: 500
+  pairs:
+    neg_pos_ratio: 50

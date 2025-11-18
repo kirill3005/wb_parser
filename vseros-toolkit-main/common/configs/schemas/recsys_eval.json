@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "metrics": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "slices": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "bootstrap": {
+      "type": "object",
+      "properties": {
+        "iters": {"type": ["integer", "null"]},
+        "seed": {"type": ["integer", "null"]}
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,18 @@
+interactions:
+  user_id: user_id
+  item_id: item_id
+  session_id: session_id
+  ts: ts
+  event_type: event
+  weight: weight
+  label: label
+items:
+  item_id: item_id
+  title: title
+  text: description
+  brand: brand
+  category: category
+  price: price
+queries:
+  scope: session
+  id_col: session_id

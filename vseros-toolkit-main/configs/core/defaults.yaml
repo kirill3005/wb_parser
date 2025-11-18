@@ -1,0 +1,11 @@
+recsys:
+  schema: !include schema.recsys.yaml
+  dataio: {}
+  candidates: {}
+  features: {}
+  eval: {}
+  rerank: {}
+  blend: {}
+paths: {}
+logging: {}
+resources: {}

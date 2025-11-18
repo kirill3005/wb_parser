@@ -1,0 +1,11 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "artifacts": {"type": "string"},
+    "data": {"type": "string"},
+    "logs": {"type": "string"}
+  },
+  "required": ["artifacts", "data", "logs"],
+  "additionalProperties": true
+}

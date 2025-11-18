@@ -1,0 +1,32 @@
+profile: panic
+recsys:
+  candidates:
+    K: 50
+    time_window_days: 7
+    generators:
+      item2vec:
+        enabled: false
+      mf_als:
+        enabled: false
+      graph_ppr:
+        enabled: false
+    quotas:
+      covis: 30
+      pop: 20
+    weights:
+      pop: 0.3
+  features:
+    blocks:
+      sequence:
+        enabled: false
+      similarity:
+        enabled: false
+      cross:
+        enabled: false
+      user_agg:
+        enabled: false
+      price_nov:
+        enabled: false
+  dataio:
+    queries:
+      limit_per_split: 50

@@ -1,0 +1,41 @@
+generators:
+  covis:
+    enabled: true
+    window_days: 30
+    alpha: 0.05
+    min_count: 2
+    max_neighbors_per_item: 200
+  pop:
+    enabled: true
+    decay_days: 30
+  session_ngram:
+    enabled: true
+    max_n: 3
+    last_k: 10
+  item2vec:
+    enabled: true
+    dim: 64
+    window: 5
+    epochs: 3
+    min_count: 1
+  mf_als:
+    enabled: true
+    factors: 64
+    reg: 0.01
+    iterations: 10
+  lightgcn:
+    enabled: false
+    dim: 64
+    layers: 2
+    epochs: 5
+  twotower:
+    enabled: false
+  content_text:
+    enabled: true
+    backend: "tfidf"
+  content_image:
+    enabled: false
+  graph_ppr:
+    enabled: true
+    restart_prob: 0.15
+    iters: 10

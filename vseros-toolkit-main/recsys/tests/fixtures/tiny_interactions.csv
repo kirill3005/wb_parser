@@ -1,0 +1,6 @@
+user_id,item_id,session_id,ts,event
+u1,i1,s1,2024-01-01,view
+u1,i2,s1,2024-01-02,purchase
+u2,i2,s2,2024-01-01,view
+u2,i3,s2,2024-01-03,view
+u3,i1,s3,2024-01-04,view

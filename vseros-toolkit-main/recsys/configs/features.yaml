@@ -1,0 +1,29 @@
+blocks:
+  pairwise_core:
+    enabled: true
+    windows_days: [7, 30]
+    decay_alpha: 0.05
+  user_agg:
+    enabled: true
+    windows_days: [30, 90]
+  item_agg:
+    enabled: true
+    windows_days: [7, 30, 90]
+  sequence:
+    enabled: true
+    last_k: [5, 10]
+    max_seq_len: 100
+  similarity:
+    enabled: true
+    use_item2vec: false
+    use_tfidf: true
+    profile_last_k: 20
+  price_nov:
+    enabled: true
+  cross:
+    enabled: false
+    whitelist:
+      - "brand_match * recency_7d"
+io:
+  dense: true
+  cast_float32: true

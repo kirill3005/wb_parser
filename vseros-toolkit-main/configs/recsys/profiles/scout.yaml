@@ -1,0 +1,25 @@
+profile: scout
+recsys:
+  candidates:
+    K: 50
+    time_window_days: 14
+    quotas:
+      covis: 40
+      pop: 20
+      session_ngram: 25
+      item2vec: 20
+    weights:
+      covis: 1.0
+      pop: 0.4
+      session_ngram: 0.8
+      item2vec: 0.9
+  features:
+    blocks:
+      sequence:
+        enabled: false
+      similarity:
+        enabled: true
+        profile_last_k: 10
+  dataio:
+    queries:
+      limit_per_split: 100

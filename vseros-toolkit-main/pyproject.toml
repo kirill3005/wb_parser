@@ -1,0 +1,52 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vseros-toolkit"  # имя пакета (как будет называться при импорте/в pip)
+version = "0.1.0"
+description = "Toolkit for Vseros AI finals: RAG, features, models, common utils"
+readme = "README.md"
+requires-python = ">=3.10"
+
+# Тут можно держать только то, что нужно именно твоему коду.
+# На всеросе почти весь стек уже предустановлен, так что список можно сократить
+# или вообще оставить пустым.
+dependencies = [
+    "numpy",
+    "pandas",
+    "scikit-learn",
+    "rank-bm25",
+    "sentence-transformers",
+    "faiss-cpu",
+    "pyarrow",
+    "jsonschema",
+]
+
+[project.optional-dependencies]
+# Можно сделать extra для локальной разработки, если хочешь
+dev = [
+    "ipykernel",
+    "jupyterlab",
+]
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+# Ищем пакеты прямо в корне репозитория (без src/)
+where = ["."]
+
+# Явно говорим: пакеты вот эти (и их подпакеты)
+include = [
+    "common",
+    "common.*",
+    "rag", 
+    "rag.*", 
+    "rag.llm", 
+    "rag.llm.*", 
+    "tabular", 
+    "tabular.*", 
+    "recsys", 
+    "recsys.*",
+]

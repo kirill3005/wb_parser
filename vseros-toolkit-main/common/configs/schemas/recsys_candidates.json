@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "generators": {"type": "object"},
+    "quotas": {"type": "object"},
+    "weights": {"type": "object"},
+    "K": {"type": "integer"},
+    "time_window_days": {"type": "integer"},
+    "cutoff": {"type": ["string", "integer"]},
+    "seed": {"type": "integer"},
+    "jobs": {"type": "integer"}
+  },
+  "required": ["generators", "K"],
+  "additionalProperties": true
+}

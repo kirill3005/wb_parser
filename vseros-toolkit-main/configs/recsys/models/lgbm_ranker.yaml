@@ -1,0 +1,22 @@
+model:
+  name: lgbm_ranker
+  task: rank
+  backend: lightgbm
+  matrix: dense
+  params:
+    objective: lambdarank
+    metric: ndcg
+    max_depth: 8
+    num_leaves: 255
+    learning_rate: 0.05
+    min_data_in_leaf: 64
+    feature_fraction: 0.7
+    lambda_l2: 5.0
+  cv:
+    n_splits: 5
+    type: time
+    embargo: 2D
+    seed: 42
+  train:
+    n_estimators: 1200
+    early_stopping_rounds: 100

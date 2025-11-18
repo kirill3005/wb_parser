@@ -1,0 +1,10 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "level": {"type": "string"},
+    "format": {"type": "string"}
+  },
+  "required": ["level", "format"],
+  "additionalProperties": true
+}

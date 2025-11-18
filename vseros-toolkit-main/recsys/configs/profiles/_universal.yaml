@@ -1,0 +1,320 @@
+# ===============================================
+# UNIVERSAL REC_SYS PROFILE (template)
+# положи как: configs/recsys/profiles/_universal.yaml
+# ===============================================
+
+dataset_id: "<set-this>"           # имя датасета (идет в пути артефактов)
+profile_id: "universal"            # имя профиля (для удобной идентификации)
+
+# ---- Глобальные настройки пайплайна ----
+globals:
+  seed: 42                          # детерминизм
+  jobs: -1                          # -1 = все ядра
+  device: "auto"                    # cpu|cuda|mps|auto
+  resume: true                      # переиспользовать артефакты, если fingerprint совпал
+  precision: "float32"              # "float32"|"float16" для ускорителей
+  time_budget_min: null             # общий лимит времени (мин.) — опц. (для ранкера/HPO)
+
+# ---- Пути к данным/артефактам ----
+paths:
+  data_dir: "data/<set-this>"
+  interactions: "${data_dir}/interactions.csv"    # основной лог
+  test:         "${data_dir}/test.csv"            # список запросов/пользователей
+  items:        "${data_dir}/item_metadata.csv"   # мета треков/товаров (опц.)
+  users:        "${data_dir}/user_metadata.csv"   # мета пользователей (опц.)
+  artifacts_root: "artifacts/recsys"              # куда класть результаты
+
+# ---- Схема колонок и типы ----
+schema:
+  query_col: "user_id"               # запрос (user/session/query)
+  item_col:  "item_id"               # документ (item/track)
+  ts_col:    "timestamp"             # datetime (если есть)
+  label_col: "label"                 # таргет в train-паре (создадим в dataio)
+  cast:                              # принудительные типы (устраняет внезапные object/float)
+    user_id: "int64"
+    item_id: "int64"
+  extra_cols:                        # что сохранить как есть (прокинуть ниже по трубе)
+    - "artist_name"
+    - "track_genres_list"
+
+# ---- Политика времени/сплитов ----
+splits:
+  strategy: "time_group"             # "kfold_group" | "time_group" | "session_time"
+  n_splits: 5
+  group_by: "user_id"                # группируем валидацию по пользователю/сессии
+  time_val_days: 14                  # размер вал-периода (для time-aware)
+  embargo_days: 0                    # запрет «подглядывать» вокруг границы
+  shuffle: true                      # актуально для kfold_group
+  random_state: 42
+
+# ---- DATAIO: адаптация и построение тренировочных пар ----
+dataio:
+  adapt:
+    drop_duplicates: true            # чистим полные дубли
+    drop_nan_query_or_item: true
+    clip_duration_ratio:
+      enabled: true                  # если interactions содержит listened_duration и track_duration
+      src_duration_col: "listened_duration"
+      ref_duration_col: "track_duration"
+      out_col: "listen_ratio_raw"   # промежуточный
+      clip_min: 0.0
+      clip_max: 1.0
+      round_to: null                 # [0, .25, .5, .75, 1.0] — если хочешь квантование
+  queries:
+    limit_per_split: null            # для быстрых прогонов (например, 20000)
+    min_history: 1                   # фильтр «совсем пустых»
+  pairs:
+    # как строим train-пары (user,item)
+    label:
+      source: "ratio_recency_mean"   # что берём как таргет: "binary"|"count"|"ratio_last"|"ratio_recency_mean"
+      ratio_half_life_days: 14       # для эксп. среднего по времени
+    negatives:
+      scheme: "inbatch+pop"          # "uniform"|"pop"|"inbatch"|"inbatch+pop"
+      neg_pos_ratio: 100             # отношение нег:поз
+      per_query_cap: 2000            # безопасность
+    similarity:
+      enabled: true                  # добавлять в пары «похожие» айтемы (по covis/item2vec)
+      topk_per_pos: 10               # добор смежных негативов (hard negatives)
+    sequence:
+      last_k: [5, 15]                # позиционные фичи/пары «из последнего окна»
+      session_gap_min: 30            # конструктор сессий
+
+# ---- CANDIDATES: генераторы и объединение ----
+candidates:
+  # Общие ручки
+  time_window_days: 60               # сколько дней истории учитывать по умолчанию
+  cutoff: "auto"                     # "auto" => K_union = max(K, sum(quotas.*), topK_submit*2)
+  K: 200                             # fallback: сколько кандидатов на пользователя минимум собрать (если нет union)
+  dedup_by_item: true
+  ensure_seen_items: true            # принудительно включить истории пользователя (даже если скор низкий)
+  cold_start:
+    fallback: "global_pop"           # что делать, если у запроса пустая история
+    K: 200
+
+  # Список генераторов (включай/выключай и настраивай)
+  pop:
+    enable: true
+    windows_days: [7, 30, 60]        # окна трендинга
+    half_life_days: 7                # эксп. затухание
+    dislike_penalty: 0.5             # штраф за дизлайки
+    with_user_recent: true           # персональный сдвиг в сторону недавних
+    quota: 30                        # сколько взять в union из этого источника (до dedup)
+
+  recent:
+    enable: true
+    days_back: 30
+    expand_artist: true              # добор новых треков любимых артистов
+    expand_genre: true
+    quota: 40
+
+  covis:
+    enable: true
+    session_gap_min: 30
+    weight: "1/log1p(dt_seconds)"    # формула веса соприсутствия
+    min_pair_count: 2
+    topn_per_item: 200
+    quota: 80
+
+  session_ngram:
+    enable: true
+    n: [2,3]                         # n-граммы внутри сессий
+    weight: "1/log1p(position_gap)"
+    quota: 60
+
+  item2vec:
+    enable: true
+    factors: 64
+    window: 20
+    min_count: 3
+    epochs: 5
+    topn_per_item: 120
+    quota: 80
+
+  mf_als:
+    enable: true
+    factors: 64
+    reg: 0.05
+    alpha: 10
+    epochs: 12
+    weight_by: "plays+ratio"         # чем взвешивать матрицу
+    topn_per_user: 200
+    quota: 60
+
+  lightgcn:
+    enable: true
+    layers: 3
+    dim: 64
+    epochs: 20
+    lr: 0.001
+    dropout: 0.0
+    topn_per_user: 200
+    quota: 40
+
+  graph_ppr:
+    enable: true
+    alpha: 0.15                       # телепортация
+    iters: 10
+    topn_per_user: 150
+    quota: 40
+
+  bm25:
+    enable: false
+    text_fields: ["track_name","artist_name","track_genres_list"]
+    min_df: 3
+    ngram_range: [1,2]
+    topn_per_user: 200
+    quota: 40
+
+  dense_ann:
+    enable: false
+    encoder: "sentence-transformers/all-MiniLM-L6-v2"
+    topn_per_user: 150
+    quota: 30
+
+  # Смешивание источников в единый пул
+  union:
+    K_union: 800                      # итоговый пул на пользователя (если cutoff != auto)
+    tie_break: ["-score", "item_id"]  # стабильный тайбрейк при равных скор
+    per_source_limit: true            # уважать quota на источник
+    per_query_weights:                # веса источников (используются на blend, если нет моделей)
+      covis: 1.0
+      pop: 0.4
+      session_ngram: 0.8
+      item2vec: 0.9
+      mf_als: 0.9
+      lightgcn: 0.9
+      graph_ppr: 0.7
+      bm25: 0.6
+      dense_ann: 0.7
+
+# ---- FEATURES: какие блоки считать для ранкера ----
+features:
+  cache: true
+  blocks:
+    user_stats:     {enabled: true, windows: [7,30,60]}
+    item_stats:     {enabled: true, windows: [7,30,60]}
+    cross:          {enabled: true, last_ratio: true, plays_ui: true, days_since_last: true}
+    source_signals: {enabled: true, one_hot_source: true, source_rank: true, source_score: true}
+    text_overlap:   {enabled: true, jaccard_genres: true, artist_match: "exact|partial"}
+    recency:        {enabled: true, query_activity_windows: [3,7,14]}
+    temporal:       {enabled: true, hour_of_day: true, dow: true}
+    embeddings:     {enabled: false, cosine_item2vec: true, cosine_dense: false}
+  memory_limit_gb: null
+
+# ---- RANKER: как учить модель(и) ----
+ranker:
+  # общий режим
+  task: "regression_ratio"            # "regression_ratio"|"lambdarank"
+  folds: 5
+  seed: 42
+  oof_save: true
+  use_features_from: "features"       # откуда брать X (обычно из features стадии)
+
+  # список моделей-кандидатов (можно одну)
+  models:
+    - name: "lgbm_reg"
+      enable: true
+      algo: "lightgbm"
+      objective: "regression"
+      params:
+        learning_rate: 0.05
+        num_leaves: 255
+        max_depth: -1
+        n_estimators: 1400
+        subsample: 0.9
+        colsample_bytree: 0.8
+        reg_alpha: 0.0
+        reg_lambda: 0.0
+      fit:
+        early_stopping_rounds: 100
+        verbose: 100
+
+    - name: "lgbm_lambdarank"
+      enable: false
+      algo: "lightgbm"
+      objective: "lambdarank"
+      params:
+        learning_rate: 0.05
+        num_leaves: 255
+        n_estimators: 1200
+        min_data_in_leaf: 20
+        metric: "ndcg"
+        eval_at: [50,100]
+      gains_map: {0:0, 0.25:1, 0.5:2, 0.75:3, 1.0:4}
+
+    - name: "linear_baseline"
+      enable: false
+      algo: "ridge"                    # ridge|logreg
+      params:
+        alpha: 1.0
+        max_iter: 200
+
+# ---- BLEND: нормализация скоров и ансамбли ----
+blend:
+  enable: true
+  per_query_norm: "zscore"            # "none"|"zscore"|"minmax"|"rank"
+  methods:
+    rrf:
+      enable: true
+      k: 60
+    combsum:
+      enable: true
+    weighted:
+      enable: true
+      nonneg: true
+      sum_to_one: true
+      search: "grid"                  # "grid"|"random"|"bayes"
+      max_trials: 80
+  level2:
+    enable: false                     # meta-модель по oof-скорам (ridge/logreg)
+    algo: "ridge"
+    alpha: 1.0
+  choose_by: "sum_ratio@K"            # какая оффлайн-метрика решает, что лучше
+  main_k: 100
+
+# ---- RERANK: пост-правила/ограничения ----
+rerank:
+  enable: true
+  rules:
+    - name: "cap_same_artist"
+      when: "same_artist"
+      limit_per_query: 3
+    - name: "diversify_genre"
+      when: "overrepresented_genre"
+      target_share: 0.6               # не больше 60% доминантного жанра
+    - name: "dislike_penalty"
+      when_item: "track_dislike_count > 0"
+      score_delta: -0.2
+    - name: "boost_recent"
+      when_pair: "days_since_last < 7"
+      score_delta: +0.05
+
+# ---- EVAL: оффлайн-оценка ----
+eval:
+  ks: [50, 100]
+  main_k: 100
+  metrics: ["recall@K","ndcg@K","sum_ratio@K"]  # третья — «кастом» для задач типа Music
+  bootstrap:
+    enable: true
+    n_samples: 200
+    random_state: 42
+  slices:                        # срезы для устойчивости
+    - by: "user.top_genre"
+    - by: "user.age_bin"
+
+# ---- SUBMIT: формат выхода ----
+submit:
+  format: "pairs_csv"            # "pairs_csv"|"space"|"jsonl"
+  K_out: 100
+  stable_tie_break: ["-score","item_id"]
+  add_id_column: true            # обязательная колонка id в начале
+  out_dir: "${paths.artifacts_root}/submits/${dataset_id}/${profile_id}"
+
+# ---- LOGGING/АРТЕФАКТЫ ----
+logging:
+  level: "INFO"
+  to_file: true
+  dir: "${paths.artifacts_root}/logs/${dataset_id}/${profile_id}"
+artifacts:
+  keep_last_runs: 5              # авто-уборка старых run/ens папок (опц.)
+  save_feature_passport: true

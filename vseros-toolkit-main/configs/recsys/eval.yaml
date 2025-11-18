@@ -1,0 +1,7 @@
+recsys:
+  eval:
+    metrics: ["recall@20", "ndcg@20"]
+    slices: []
+    bootstrap:
+      iters: null
+      seed: 42

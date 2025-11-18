@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "n_jobs": {"type": "integer"},
+    "cpu_affinity": {"type": ["string", "null"]},
+    "gpu": {"type": ["string", "null"]},
+    "mem_gb_limit": {"type": ["number", "null"]}
+  },
+  "required": ["n_jobs"],
+  "additionalProperties": true
+}

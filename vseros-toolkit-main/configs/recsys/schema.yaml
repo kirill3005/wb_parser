@@ -1,0 +1,21 @@
+recsys:
+  schema:
+    interactions:
+      user_id: user_id
+      item_id: item_id
+      ts: ts
+      session_id: session_id
+      event_type: event
+      weight: weight
+      label: label
+    items:
+      item_id: item_id
+      title: title
+      text: description
+      brand: brand
+      category: category
+      price: price
+      age_added: age_added
+    queries:
+      scope: session
+      id_col: session_id

@@ -1,0 +1,4 @@
+paths:
+  artifacts: "artifacts"
+  data: "data"
+  logs: "logs"

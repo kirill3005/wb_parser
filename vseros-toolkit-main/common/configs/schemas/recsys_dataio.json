@@ -1,0 +1,44 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "sessionize": {
+      "type": "object",
+      "properties": {
+        "enable": {"type": "boolean"},
+        "session_gap_min": {"type": "integer"},
+        "max_session_len": {"type": ["integer", "null"]}
+      },
+      "required": ["enable", "session_gap_min"]
+    },
+    "splits": {
+      "type": "object",
+      "properties": {
+        "mode": {"enum": ["global", "rolling"]},
+        "train_until": {"type": ["string", "null"]},
+        "val_until": {"type": ["string", "null"]},
+        "test_until": {"type": ["string", "null"]},
+        "embargo": {"type": ["string", "null"]}
+      },
+      "required": ["mode"]
+    },
+    "queries": {
+      "type": "object",
+      "properties": {
+        "scope": {"enum": ["session", "user"]},
+        "limit_per_split": {"type": ["integer", "null"]}
+      },
+      "required": ["scope"]
+    },
+    "pairs": {
+      "type": "object",
+      "properties": {
+        "neg_pos_ratio": {"type": "integer"},
+        "neg_strategy": {"enum": ["uniform", "pop", "hard"]},
+        "seed": {"type": "integer"}
+      },
+      "required": ["neg_pos_ratio", "neg_strategy", "seed"]
+    }
+  },
+  "additionalProperties": true
+}

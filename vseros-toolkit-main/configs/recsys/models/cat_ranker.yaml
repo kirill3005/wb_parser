@@ -1,0 +1,17 @@
+model:
+  name: cat_ranker
+  task: rank
+  backend: catboost
+  matrix: dense
+  params:
+    loss_function: YetiRank
+    iterations: 800
+    learning_rate: 0.07
+    depth: 8
+  cv:
+    n_splits: 3
+    type: time
+    embargo: 1D
+    seed: 42
+  train:
+    early_stopping_rounds: 50

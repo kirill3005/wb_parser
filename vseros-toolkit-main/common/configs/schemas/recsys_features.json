@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "blocks": {"type": "object"},
+    "io": {
+      "type": "object",
+      "properties": {
+        "dense": {"type": "boolean"},
+        "cast_float32": {"type": "boolean"}
+      },
+      "required": ["dense", "cast_float32"],
+      "additionalProperties": true
+    }
+  },
+  "required": ["blocks"],
+  "additionalProperties": true
+}

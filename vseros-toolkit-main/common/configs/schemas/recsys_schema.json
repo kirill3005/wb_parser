@@ -1,0 +1,42 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "interactions": {
+      "type": "object",
+      "properties": {
+        "user_id": {"type": "string"},
+        "item_id": {"type": "string"},
+        "ts": {"type": ["string", "integer"]},
+        "session_id": {"type": "string"},
+        "event_type": {"type": "string"},
+        "weight": {"type": ["string", "number", "null"]},
+        "label": {"type": ["string", "integer", "null"]}
+      },
+      "required": ["user_id", "item_id", "ts"]
+    },
+    "items": {
+      "type": "object",
+      "properties": {
+        "item_id": {"type": "string"},
+        "title": {"type": "string"},
+        "text": {"type": "string"},
+        "brand": {"type": "string"},
+        "category": {"type": "string"},
+        "price": {"type": ["string", "number", "null"]},
+        "age_added": {"type": ["string", "integer", "null"]}
+      },
+      "required": ["item_id"]
+    },
+    "queries": {
+      "type": "object",
+      "properties": {
+        "scope": {"enum": ["session", "user"]},
+        "id_col": {"type": "string"}
+      },
+      "required": ["scope", "id_col"]
+    }
+  },
+  "required": ["interactions", "items", "queries"],
+  "additionalProperties": true
+}

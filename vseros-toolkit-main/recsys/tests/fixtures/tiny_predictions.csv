@@ -1,0 +1,5 @@
+query_id,item_id,score
+u1,i1,0.9
+u1,i2,0.2
+u2,i2,0.8
+u2,i3,0.1

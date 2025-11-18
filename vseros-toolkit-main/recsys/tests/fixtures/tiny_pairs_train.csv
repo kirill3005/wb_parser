@@ -1,0 +1,4 @@
+query_id,item_id,ts_query,label
+u1,i1,2023-01-03,1
+u1,i2,2023-01-03,0
+u2,i2,2023-01-04,1

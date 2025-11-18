@@ -1,0 +1,23 @@
+profile: gate
+recsys:
+  candidates:
+    K: 100
+    time_window_days: 30
+    quotas:
+      covis: 60
+      pop: 30
+      session_ngram: 40
+      item2vec: 40
+      mf_als: 30
+    weights:
+      mf_als: 0.9
+  features:
+    blocks:
+      cross:
+        enabled: false
+      sequence:
+        enabled: true
+        last_k: [5, 15]
+  dataio:
+    queries:
+      limit_per_split: 500
